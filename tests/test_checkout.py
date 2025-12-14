@@ -1,0 +1,8 @@
+"""
+Cart tests - TODO: Implement later
+"""
+import pytest
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_placeholder():
+    pass
