@@ -1,53 +1,64 @@
 """
-Pytest configuration and fixtures
+Pytest configuration and fixtures - Using local ChromeDriver
 """
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from config.config import Config
 import logging
 import os
-import shutil
+import sys
 
 @pytest.fixture(scope="function")
 def driver():
     """
-    Setup and teardown browser driver for each test
+    Setup and teardown browser driver using local ChromeDriver
     """
-    # Clear webdriver-manager cache to force fresh download
-    cache_path = os.path.join(os.path.expanduser("~"), ".wdm")
-    if os.path.exists(cache_path):
-        try:
-            shutil.rmtree(cache_path)
-            print("Cleared webdriver-manager cache")
-        except Exception as e:
-            print(f"Warning: Could not clear cache: {e}")
-    
-    # Setup Chrome options
+    # Chrome options for headless execution
     chrome_options = Options()
-    chrome_options.add_argument("--start-maximized")
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--disable-popup-blocking")
-    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--headless")  # Run without UI (works better in Jenkins)
+    chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-popup-blocking")
     
-    # Create driver with webdriver_manager
+    # Try to find ChromeDriver in multiple locations
+    possible_paths = [
+        r"C:\Windows\System32\chromedriver.exe",
+        r"C:\chromedriver.exe",
+        os.path.join(os.getcwd(), "drivers", "chromedriver.exe"),
+        os.path.join(os.path.dirname(__file__), "drivers", "chromedriver.exe"),
+        "chromedriver.exe"  # If it's in PATH
+    ]
+    
+    driver_path = None
+    for path in possible_paths:
+        if os.path.exists(path):
+            driver_path = path
+            print(f"Found ChromeDriver at: {driver_path}")
+            break
+    
+    if not driver_path:
+        # Try without path (if in System PATH)
+        driver_path = "chromedriver"
+        print("Using ChromeDriver from system PATH")
+    
     try:
-        print("Downloading ChromeDriver...")
-        service = Service(ChromeDriverManager().install())
-        print(f"ChromeDriver path: {service.path}")
-        
+        # Create service and driver
+        service = Service(executable_path=driver_path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+        # Set implicit wait
         driver.implicitly_wait(Config.IMPLICIT_WAIT)
         
-        print("Navigating to application...")
+        # Navigate to application
+        print(f"Navigating to: {Config.BASE_URL}")
         driver.get(Config.BASE_URL)
         print(f"Current URL: {driver.current_url}")
+        print(f"Page title: {driver.title}")
         
         yield driver
         
@@ -57,6 +68,9 @@ def driver():
         
     except Exception as e:
         print(f"ERROR creating driver: {e}")
+        print(f"Python version: {sys.version}")
+        print(f"Current directory: {os.getcwd()}")
+        print(f"Attempted driver path: {driver_path}")
         import traceback
         traceback.print_exc()
         raise
@@ -66,7 +80,6 @@ def setup_logging():
     """
     Configure logging for test execution
     """
-    # Create reports directory
     os.makedirs('reports', exist_ok=True)
     os.makedirs('reports/screenshots', exist_ok=True)
     
@@ -82,7 +95,7 @@ def setup_logging():
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """
-    Take screenshot automatically when test fails
+    Take screenshot when test fails
     """
     outcome = yield
     report = outcome.get_result()
