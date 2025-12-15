@@ -25,26 +25,14 @@ def driver():
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-popup-blocking")
     
-    # Try to find ChromeDriver in multiple locations
-    possible_paths = [
-        r"C:\Windows\System32\chromedriver.exe",
-        r"C:\chromedriver.exe",
-        os.path.join(os.getcwd(), "drivers", "chromedriver.exe"),
-        os.path.join(os.path.dirname(__file__), "drivers", "chromedriver.exe"),
-        "chromedriver.exe"  # If it's in PATH
-    ]
+    # ChromeDriver path (downloaded by Jenkins build script)
+    driver_path = os.path.join(os.getcwd(), "drivers", "chromedriver.exe")
     
-    driver_path = None
-    for path in possible_paths:
-        if os.path.exists(path):
-            driver_path = path
-            print(f"Found ChromeDriver at: {driver_path}")
-            break
+    print(f"Current directory: {os.getcwd()}")
+    print(f"Looking for ChromeDriver at: {driver_path}")
     
-    if not driver_path:
-        # Try without path (if in System PATH)
-        driver_path = "chromedriver"
-        print("Using ChromeDriver from system PATH")
+    if not os.path.exists(driver_path):
+        raise FileNotFoundError(f"ChromeDriver not found at: {driver_path}")
     
     try:
         # Create service and driver
@@ -69,8 +57,7 @@ def driver():
     except Exception as e:
         print(f"ERROR creating driver: {e}")
         print(f"Python version: {sys.version}")
-        print(f"Current directory: {os.getcwd()}")
-        print(f"Attempted driver path: {driver_path}")
+        print(f"Driver path checked: {driver_path}")
         import traceback
         traceback.print_exc()
         raise
