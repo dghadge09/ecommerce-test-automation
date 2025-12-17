@@ -1,9 +1,9 @@
 # E-Commerce Test Automation Framework
 
-## 🎯 Overview
+##  Overview
 Enterprise-level test automation framework for e-commerce application testing using Python, Selenium WebDriver, and Pytest. Features Page Object Model design pattern, data-driven testing, and CI/CD integration with Jenkins.
 
-## 🏗️ Framework Architecture
+##  Framework Architecture
 ```
 EcommerceTestFramework/
 ├── config/          # Configuration and settings
@@ -23,13 +23,13 @@ EcommerceTestFramework/
 - **Jenkins** - CI/CD integration
 
 ## 📋 Features
-- ✅ Page Object Model architecture
-- ✅ Data-driven testing
-- ✅ Configurable environments
-- ✅ HTML test reports with screenshots
-- ✅ Automatic screenshot on failure
-- ✅ CI/CD ready
-- ✅ Cross-browser support
+-  Page Object Model architecture
+-  Data-driven testing
+-  Configurable environments
+-  HTML test reports with screenshots
+-  Automatic screenshot on failure
+-  CI/CD ready
+-  Cross-browser support
 
 ## 🚀 Getting Started
 
@@ -73,22 +73,22 @@ Run with HTML report:
 pytest --html=reports/test_report.html
 ```
 
-## 📊 Test Reports
+##  Test Reports
 After test execution, reports are available in:
 - **HTML Report:** `reports/test_report.html`
 - **Screenshots:** `reports/screenshots/`
 - **Logs:** `reports/test_execution.log`
 
-## 🔄 CI/CD Integration
+## CI/CD Integration
 This framework is integrated with Jenkins for continuous testing:
 - Automatic test execution on code push
 - Email notifications with test results
 - Test trend tracking
 
 ## 👤 Author
-**Your Name**
-- LinkedIn: [Your LinkedIn]
-- Email: your.email@example.com
+Dipti Gahdge
+- LinkedIn: www.linkedin.com/in/dipti-g-16b43219
+- Email: dipti_ghadge@yahoo.com
 
-## 📝 License
+
 This project is for portfolio demonstration purposes.
